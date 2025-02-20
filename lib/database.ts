@@ -1,4 +1,4 @@
-// Placeholder for Supabase database interactions
+// Database utility functions
 export interface Recording {
   id?: string
   title?: string
