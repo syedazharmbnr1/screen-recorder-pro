@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useRef } from 'react'
 
 interface ScreenRecorderProps {
   onRecordingStart?: () => void
@@ -10,7 +10,8 @@ const ScreenRecorder: React.FC<ScreenRecorderProps> = ({
   onRecordingStop
 }) => {
   const [isRecording, setIsRecording] = useState(false)
-  const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null)
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null)
+  const chunksRef = useRef<Blob[]>([])
 
   const startRecording = async () => {
     try {
@@ -19,22 +20,22 @@ const ScreenRecorder: React.FC<ScreenRecorderProps> = ({
         audio: true
       })
 
-      const recorder = new MediaRecorder(stream)
-      const chunks: Blob[] = []
+      const mediaRecorder = new MediaRecorder(stream)
+      mediaRecorderRef.current = mediaRecorder
+      chunksRef.current = []
 
-      recorder.ondataavailable = (e) => {
+      mediaRecorder.ondataavailable = (e) => {
         if (e.data.size > 0) {
-          chunks.push(e.data)
+          chunksRef.current.push(e.data)
         }
       }
 
-      recorder.onstop = () => {
-        const recordedBlob = new Blob(chunks, { type: 'video/webm' })
+      mediaRecorder.onstop = () => {
+        const recordedBlob = new Blob(chunksRef.current, { type: 'video/webm' })
         onRecordingStop?.(recordedBlob)
       }
 
-      recorder.start()
-      setMediaRecorder(recorder)
+      mediaRecorder.start()
       setIsRecording(true)
       onRecordingStart?.()
     } catch (error) {
@@ -43,7 +44,7 @@ const ScreenRecorder: React.FC<ScreenRecorderProps> = ({
   }
 
   const stopRecording = () => {
-    mediaRecorder?.stop()
+    mediaRecorderRef.current?.stop()
     setIsRecording(false)
   }
 

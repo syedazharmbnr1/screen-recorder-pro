@@ -2,9 +2,10 @@ import React, { useState } from 'react'
 
 interface VideoEditorProps {
   videoBlob?: Blob
+  onEdit?: (editedBlob: Blob) => void
 }
 
-const VideoEditor: React.FC<VideoEditorProps> = ({ videoBlob }) => {
+const VideoEditor: React.FC<VideoEditorProps> = ({ videoBlob, onEdit }) => {
   const [trimStart, setTrimStart] = useState(0)
   const [trimEnd, setTrimEnd] = useState(0)
 
@@ -17,8 +18,11 @@ const VideoEditor: React.FC<VideoEditorProps> = ({ videoBlob }) => {
   }
 
   const applyEdits = () => {
-    // TODO: Implement video editing logic
-    console.log('Applying edits', { trimStart, trimEnd })
+    if (videoBlob) {
+      // TODO: Implement actual video editing
+      console.log('Applying edits', { trimStart, trimEnd })
+      onEdit?.(videoBlob)
+    }
   }
 
   return (
