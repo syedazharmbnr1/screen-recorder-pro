@@ -1,28 +1,42 @@
-// Video processing utility functions
+// Advanced Video Processing Utility
 export interface VideoProcessingOptions {
   trimStart?: number
   trimEnd?: number
-  addWatermark?: boolean
-  adjustSpeed?: number
+  speed?: number
+  watermark?: string
 }
 
 export async function processVideo(
   videoBlob: Blob, 
-  options: VideoProcessingOptions
+  options: VideoProcessingOptions = {}
 ): Promise<Blob> {
-  // TODO: Implement actual video processing
-  console.log('Processing video with options:', options)
-  return videoBlob
+  const defaultOptions = {
+    trimStart: 0,
+    trimEnd: Infinity,
+    speed: 1,
+    watermark: ''
+  }
+
+  const mergedOptions = { ...defaultOptions, ...options }
+
+  // TODO: Implement actual video processing logic
+  console.log('Processing video with options:', mergedOptions)
+
+  return new Promise((resolve) => {
+    // Placeholder: return original blob
+    resolve(videoBlob)
+  })
 }
 
-export function extractVideoMetadata(videoBlob: Blob) {
-  return new Promise<{
-    duration: number
-    width: number
-    height: number
-  }>((resolve) => {
+export function getVideoMetadata(videoBlob: Blob): Promise<{
+  duration: number
+  width: number
+  height: number
+}> {
+  return new Promise((resolve, reject) => {
     const video = document.createElement('video')
     video.src = URL.createObjectURL(videoBlob)
+
     video.onloadedmetadata = () => {
       resolve({
         duration: video.duration,
@@ -30,5 +44,7 @@ export function extractVideoMetadata(videoBlob: Blob) {
         height: video.videoHeight
       })
     }
+
+    video.onerror = reject
   })
 }
